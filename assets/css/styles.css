@@ -1,3 +1,10 @@
+:root {
+  --list-item-height: 200px;
+  --list-item-footer-height: 34px;
+  --red: rgb(235, 40, 40);
+  --green: #21c621;
+}
+
 *, 
 *::after,
 *::before {
@@ -62,10 +69,58 @@ body {
   }
 
   .list-item {
-    height: 100px;
+    height: var(--list-item-height);
     background: #fff;
     border-radius: 8px;
     box-shadow: 1px 1px 1px rgba(0,0,0,0.3);
     padding: 8px;
+    position: relative;
+    padding-bottom: calc(var(--list-item-footer-height) + 8px);
   }
 
+  .item-content {
+    width: 100%;
+    height: calc(var(--list-item-height) - var(--list-item-footer-height) - 16px);
+  }
+
+  .list-item-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--list-item-footer-height);
+    background: var(--green);
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    display: grid;
+    align-items: center;
+    grid-template-columns: 50% 50%;
+    overflow: hidden;
+  }
+
+  .delete-btn {
+    color: #FFFFFF;
+    background-color: var(--red);
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    cursor: pointer;
+  }
+
+  .delete-btn svg {
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+  }
+
+  .delete-btn svg *{
+    stroke: #FFFFFF;
+  }
+
+
+  /* classes to toggle */
+.blur {
+  filter: blur(2px);
+}
