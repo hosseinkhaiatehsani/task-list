@@ -4,6 +4,7 @@
   --modal-content-text-height: 90%;
   --red: rgb(235, 40, 40);
   --green: #21c621;
+  --gray: #c2c2c2;
 
 }
 
@@ -19,6 +20,7 @@ body {
     width: 100%;
     height: 100vh;
     background-color: #ff9828;
+    font-family:  monospace, 'sans-serif';
 }
 
 .input-container {
@@ -57,6 +59,13 @@ body {
     border: none;
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
+    background-color: var(--green);
+    cursor: pointer;
+  }
+
+  #add-todo svg {
+    fill: #FFF;
+    pointer-events: none;
   }
 
   #list-container {
@@ -96,7 +105,7 @@ body {
     left: 0;
     width: 100%;
     height: var(--list-item-footer-height);
-    background: var(--green);
+    background: var(--gray);
     border-bottom-right-radius: 8px;
     border-bottom-left-radius: 8px;
     display: grid;
@@ -121,8 +130,8 @@ body {
   }
 
   .delete-btn svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     pointer-events: none;
   }
 
@@ -196,6 +205,12 @@ body {
     height: var(--modal-content-text-height);
     resize: none;
     padding: 8px;
+    border: none;
+    /* border-radius: 8px; */
+    border-top: 1px solid var(--gray);
+    /* box-shadow: 0 0 4px var(--gray); */
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   .modal-footer {
@@ -222,50 +237,36 @@ body {
   }
 
   /* test checkbox */
-  .custom-checkbox {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-  }
-  
-  .custom-checkbox input {
-    display: none;
-  }
-  
-  .checkmark {
-    display: inline-block;
+  input.check-item {
+    appearance: none;
+    border: 1px solid #fff;
     width: 20px;
     height: 20px;
-    border: 2px solid #bbb;
     border-radius: 4px;
-    margin-right: 10px;
+    margin: auto;
     position: relative;
   }
-  
-  .checkmark svg {
-    display: none;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 30px;
-    height: 30px;
+
+  input.check-item:hover {
+    background: rgba(255,255,255,0.1);
   }
 
-  .checkmark svg path {
-    fill: #FFF;
+  input.check-item::before {
+    content: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.71,7.21a1,1,0,0,0-1.42,0L9.84,14.67,6.71,11.53A1,1,0,1,0,5.29,13l3.84,3.84a1,1,0,0,0,1.42,0l8.16-8.16A1,1,0,0,0,18.71,7.21Z' fill='%2321c621'/%3E%3C/svg%3E");
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 30px;
+    height: 30px;
+    display: none;
   }
-  
-  .custom-checkbox input:checked + .checkmark svg {
+
+  input.check-item:checked {
+    border:2px solid var(--green);
+  }
+
+  input.check-item:checked::before {
     display: block;
-  }
-  
-  .custom-checkbox:hover .checkmark {
-    border-color: #777;
-  }
-  
-  .custom-checkbox input:focus + .checkmark {
-    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.5);
   }
 
   /* classes to toggle */
@@ -287,12 +288,20 @@ body {
 }
 
 @media (max-width: 599px) {
+  :root {
+    --modal-content-text-height: 92%;
+  }
   .input-group {
     grid-template-columns: auto 40px;
   }
 
   #todo-input {
     font-size: 14px;
+  }
+  .modal-container,
+  .modal-content {
+    width: 100%;
+    height: 100%;
   }
 
   #list-container {

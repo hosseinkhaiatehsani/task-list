@@ -7,11 +7,15 @@ const app = document.querySelector("[data-app]");
 const toDoForm = document.querySelector("[data-submit-todo-form]");
 // const addToDoButton = document.querySelector("[data-add-todo]");
 
+
+let isTaskDeaitlModalActive = false;
 // console.log(TEST);
 
 document.addEventListener("DOMContentLoaded", function(){
     init();
 });
+
+window.addEventListener("popstate", handleWindowBackButton)
 
 
 // function createToDoInput(){
@@ -43,6 +47,7 @@ function handleFromAction(event){
     }
 
     toDoListData.push(newItem);
+    resetIndexs();
     renderItem(newItem);
 
     saveToStorage();
@@ -156,16 +161,23 @@ function toggleBlur(parent){
 }
 
 function handleItemDelete(e){
-    // console.log(e.target)
     let itemId = e.target.parentElement.dataset.id;
     itemId = parseInt(itemId);
 
     let newList = toDoListData.filter(item => item.id != itemId);
     toDoListData.length = 0;
     toDoListData.push(...newList);
-
+    
+    resetIndexs();
     renderToDoList();
     saveToStorage();
+}
+
+function resetIndexs(){
+    toDoListData.map((item, index) => {
+        item.id = index;
+        return item;
+    })
 }
 
 function handleMagnifierButton(event){
@@ -175,12 +187,11 @@ function handleMagnifierButton(event){
         return item.id == parseInt(itemId);
     });
 
-    // console.log(data);
-
     createModalElement(data[0]);
 }
 
 function createModalElement(data){
+
     let modalContainer = document.createElement("div");
     modalContainer.classList.add("modal-container");
     
@@ -200,6 +211,13 @@ function createModalElement(data){
 }
 
 function prepareModalContent(modalContent, data){
+    isTaskDeaitlModalActive = true;
+    history.pushState(null, null, window.location);
+
+    let modalHeader = document.createElement("h2");
+    modalHeader.classList.add("modal-header");
+    modalHeader.innerText = "Description"
+
     let textBox = document.createElement("textarea");
     textBox.classList.add("magnify-txt");
     textBox.setAttribute("readonly", "readonly")
@@ -213,14 +231,25 @@ function prepareModalContent(modalContent, data){
     close.innerText = "Close";
 
     modalFooter.appendChild(close);
+    modalContent.appendChild(modalHeader)
     modalContent.appendChild(textBox);
     modalContent.appendChild(modalFooter);
 
     close.addEventListener("click", closeModal);
 }
 
-function closeModal() {
-    let parent = document.querySelector(".modal-container")
+function isTaskContentModalOpen(){
+    return isTaskDeaitlModalActive;
+}
 
+function closeModal() {
+    isTaskDeaitlModalActive = false;
+    let parent = document.querySelector(".modal-container")
     parent.remove();
+}
+
+function handleWindowBackButton(){
+    if(isTaskContentModalOpen()){
+        closeModal();
+    }
 }
