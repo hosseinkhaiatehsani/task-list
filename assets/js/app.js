@@ -9,14 +9,31 @@ const toDoForm = document.querySelector("[data-submit-todo-form]");
 
 
 let isTaskDeaitlModalActive = false;
+let deferredPrompt;
 // console.log(TEST);
 
 document.addEventListener("DOMContentLoaded", function(){
     init();
+
+    if("serviceWorker" in navigator){
+        window.navigator.serviceWorker.register('../service-worker.js')
+    }
 });
 
-window.addEventListener("popstate", handleWindowBackButton)
+window.addEventListener("popstate", handleWindowBackButton);
 
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevents the default mini-infobar or install dialog from appearing on mobile
+    e.preventDefault();
+    // Save the event because you'll need to trigger it later.
+    deferredPrompt = e;
+    // Show your customized install prompt for your PWA
+    // Your own UI doesn't have to be a single element, you
+    // can have buttons in different locations, or wait to prompt
+    // as part of a critical journey.
+    // showInAppInstallPromotion();
+    console.log("before install was fired!")
+});
 
 // function createToDoInput(){
 //     let inputContainer = document.createElement("div");
