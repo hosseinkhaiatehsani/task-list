@@ -1,0 +1,37 @@
+{
+    "name": "To Do List",
+    "short_name": "To Do List",
+    "shortcuts": [
+        {
+            "name": "check",
+            "short_name": "Check",
+            "url": "/search.html",
+            "icons": [
+                { "src": "assets/images/logo-192x192.png", "sizes": "192x192", "type": "image/png" }
+              ]
+        }
+    ],
+    "icons": [
+      {
+        "src": "assets/images/logo-192x192.jpg",
+        "sizes": "192x192",
+        "type": "image/jpg"
+      },
+      {
+        "src": "assets/images/logo-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "maskable"
+      },
+      {
+        "src": "assets/images/logo-large.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "lang": "en-US",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ccc",
+    "theme_color": "#c2c2c2"
+}
