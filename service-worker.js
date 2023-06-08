@@ -1,45 +1,43 @@
-let cacheName = "ToDoList";
-let filesToCache = ["/", "./assets/images/logo-large.png", "./assets/css/styles.css", "./assets/js/app.js"];
+const CACHE_NAME = 'to-do-list-v1';
 
-const OFFLINE_URL = `index.html`;
-const CACHE_NAME = 'ToDoList';
-const HOST = self.location.host;
-const PROTOCOL = self.location.protocol;
-// const REGEX = `${PROTOCOL}//${HOST}/assets/.*|${PROTOCOL}//${HOST}/assets/logo-large.png`;
+const PRECACHE_URLS = [
+    'index.html', // Add the URL of your app's homepage
+    './assets/css/styles.css',
+    './assets/js/app.js',
+    "./assets/images/logo-large.png"
+    // Add other essential assets to be precached
+];
 
-// to import other service workers
-// importScripts("./");
-
-self.addEventListener('install', function(e) {
-    e.waitUntil((async () => {
-        const cache = await caches.open(CACHE_NAME);
-        await cache.addAll(filesToCache);
-      })());
-      self.skipWaiting();
+self.addEventListener('install', function(event) {
+    event.waitUntil(
+        caches.open(CACHE_NAME).then(function(cache) {
+        return cache.addAll(PRECACHE_URLS);
+        })
+    );
 });
-
-self.addEventListener("activate", event => {
-    // when this SW becomes activated, we claim all the opened clients
-    // they can be standalone PWA windows or browser tabs
-    event.waitUntil(clients.claim());
-});
-
-self.addEventListener('fetch', function(e) {
-
-    e.request.mode === "navigate" && 
-    e.respondWith(
-        Promise.resolve(e.preloadResponse)
-        .then((response => response || fetch(e.request)))
-        .catch((
-                ()=>caches.open(CACHE_NAME)
-                .then((event => event.match(OFFLINE_URL)))
-            )) 
-    )
-    // ,
-    // new RegExp(REGEX).test(e.request.url) && 
-    // e.respondWith(
-    //     caches.open(CACHE_NAME)
-    //     .then((response => response.match(e.request.url)))
-    //     .catch((error => error || fetch(e.request)))
-    // )
+  
+self.addEventListener('fetch', function(event) {
+    // Check if the requested resource is available in cache
+    event.respondWith(
+      caches.match(event.request).then(function(response) {
+        if (response) {
+          return response;
+        }
+  
+        // If the user is offline, return the custom offline page
+        if (!navigator.onLine) {
+          return caches.match('/offline.html');
+        }
+  
+        // If the requested resource is not in cache and the user is online, fetch it from the network
+        return fetch(event.request).then(function(response) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(function(cache) {
+            cache.put(event.request, responseClone);
+          });
+  
+          return response;
+        });
+      })
+    );
 });
