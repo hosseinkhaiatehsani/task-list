@@ -1,8 +1,13 @@
 // import { TEST } from "./test.js";
 import { toDoListData } from "./data.js";
+import { 
+    storeData,
+    retrieveAllData,
+    deleteData,
+} from "./indexed-db.js";
 
 
-let storageName = "toDoList";
+let storageName = "to-do-list";
 const app = document.querySelector("[data-app]");
 const toDoForm = document.querySelector("[data-submit-todo-form]");
 // const addToDoButton = document.querySelector("[data-add-todo]");
@@ -15,9 +20,15 @@ let deferredPrompt;
 document.addEventListener("DOMContentLoaded", function(){
     init();
 
-    if("serviceWorker" in navigator){
-        window.navigator.serviceWorker.register('../service-worker.js')
-    }
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('service-worker.js').then(function(registration) {
+            // console.log('Service Worker registered with scope:', registration.scope);
+          }, function(error) {
+            // console.log('Service Worker registration failed:', error);
+          });
+        });
+      }
 });
 
 window.addEventListener("popstate", handleWindowBackButton);
@@ -39,15 +50,16 @@ window.addEventListener('beforeinstallprompt', (e) => {
 //     let inputContainer = document.createElement("div");
 //     let input = document.createElement("input");
 // }
-function init(){
+async function init(){
+    // openDatabase(storageName)
+    toDoForm.addEventListener("submit", handleFromAction);
     let list = document.createElement("div");
     list.dataset.listId = "list-id";
     list.id = "list-container";
     app.appendChild(list);
 
-    loadFromStorage();
+    await loadFromStorage();
     renderToDoList();
-    toDoForm.addEventListener("submit", handleFromAction);
 }
 
 function handleFromAction(event){
@@ -64,7 +76,7 @@ function handleFromAction(event){
     }
 
     toDoListData.push(newItem);
-    resetIndexs();
+    // resetIndexs();
     renderItem(newItem);
 
     saveToStorage();
@@ -73,27 +85,42 @@ function handleFromAction(event){
 }
 
 function generateIndex(){
-    let len = toDoListData.length;
+    let sectionOne = Date.now();
+    let sectionTwo = Math.floor(Math.random() * 1000000);
+    let id = `${sectionOne}-${sectionTwo}`;
 
-    return len;
+    return id;
 }
 
-function saveToStorage(){
-    let preparedData = JSON.stringify(toDoListData);
-    localStorage.setItem(storageName, preparedData);
-}
-
-function loadFromStorage(){
-    let storageData = localStorage.getItem(storageName);
-    let storageJsonData = JSON.parse(storageData);
-
-    if(storageJsonData && storageJsonData.length > 0){
-        toDoListData.push(...storageJsonData)
+async function saveToStorage(){
+    // let preparedData = JSON.stringify(toDoListData);
+    // localStorage.setItem(storageName, preparedData);
+    try{
+        // last step => face db.transaction is not a function
+        // console.log(toDoListData)
+        await storeData(storageName, toDoListData);
+    }catch(er) {
+        console.log(er)
     }
 }
 
-function renderToDoList(){
-    if(toDoListData.length == 0) return;
+async function loadFromStorage(){
+    // let storageData = localStorage.getItem(storageName);
+    // let storageJsonData = JSON.parse(storageData);
+    return new Promise(async(resolve) => {
+        let storageData = await retrieveAllData(storageName);
+    
+        if(storageData && storageData.length > 0){
+            toDoListData.push(...storageData)
+            resolve();
+        }
+    });
+
+
+}
+
+function renderToDoList(isFromDeleteMethod = false){
+    if(toDoListData.length == 0 && !isFromDeleteMethod) return;
 
     let list = document.querySelector("[data-list-id]");
     list.innerHTML = "";
@@ -164,7 +191,6 @@ function handleListItemChange(e) {
 }
 
 function toggleToDoItemStatus(id){
-    id = parseInt(id);
     return toDoListData.map(item => {
         if(item.id == id)
             item.done = !item.done;
@@ -177,31 +203,32 @@ function toggleBlur(parent){
     content.classList.toggle("blur");
 }
 
-function handleItemDelete(e){
+async function handleItemDelete(e){
     let itemId = e.target.parentElement.dataset.id;
-    itemId = parseInt(itemId);
+    itemId = itemId;
 
     let newList = toDoListData.filter(item => item.id != itemId);
     toDoListData.length = 0;
     toDoListData.push(...newList);
     
-    resetIndexs();
-    renderToDoList();
-    saveToStorage();
+    // resetIndexs();
+    await deleteData(storageName, itemId);
+    renderToDoList(true);
+    // saveToStorage();
 }
 
-function resetIndexs(){
-    toDoListData.map((item, index) => {
-        item.id = index;
-        return item;
-    })
-}
+// function resetIndexs(){
+//     toDoListData.map((item, index) => {
+//         item.id = index;
+//         return item;
+//     })
+// }
 
 function handleMagnifierButton(event){
     // console.log(event.target)
     let itemId = event.target.parentElement.id;
     let data = toDoListData.filter(item => {
-        return item.id == parseInt(itemId);
+        return item.id == itemId;
     });
 
     createModalElement(data[0]);
