@@ -1,4 +1,5 @@
 :root {
+  --main-bg: #e2e2e2;
   --list-item-height: 200px;
   --list-item-footer-height: 34px;
   --modal-content-text-height: 90%;
@@ -19,7 +20,7 @@
 body {
     width: 100%;
     height: 100vh;
-    background-color: #ff9828;
+    background-color: var(--main-bg);
     font-family:  monospace, 'sans-serif';
 }
 
@@ -292,7 +293,7 @@ body {
     --modal-content-text-height: 92%;
   }
   .input-group {
-    grid-template-columns: auto 40px;
+    grid-template-columns: auto 50px;
   }
 
   #todo-input {
