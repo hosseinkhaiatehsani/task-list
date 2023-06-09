@@ -175,7 +175,13 @@ export function deleteData(databaseName, key) {
 
 export function checkDataBase(){
   return new Promise(resolve => {
-    let db = indexedDB.databases();
-    resolve(db)
+    try{
+
+      let db = indexedDB.databases();
+      resolve(db)
+    }catch(err){
+      resolve([])
+    }
+    
   })
 }
