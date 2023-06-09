@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#ff9828">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/styles.css" />
     <link rel="icon" type="image/x-icon" href="./assets/images/logo-192x192.png">
     <link rel="apple-touch-icon" sizes="192x192" href="assets/images/logo-192x192.jpg">
@@ -16,13 +17,19 @@
     <div data-app id="app">
         <form data-submit-todo-form class="input-container">
             <div class="input-group">
-                <input data-todo-input type="text" name="todo" id="todo-input">
+                <input data-todo-input type="text" name="todo" id="todo-input" placeholder="Write here...">
                 <button data-add-todo id="add-todo">
                     <svg height="32px" id="Layer_1" style="enable-background:new 0 0 32 32;" version="1.1" viewBox="0 0 32 32" width="32px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <path d="M28,14H18V4c0-1.104-0.896-2-2-2s-2,0.896-2,2v10H4c-1.104,0-2,0.896-2,2s0.896,2,2,2h10v10c0,1.104,0.896,2,2,2  s2-0.896,2-2V18h10c1.104,0,2-0.896,2-2S29.104,14,28,14z"/>
                     </svg>
                 </button>
+
             </div>
+            <select data-category-select id="todo-cateogry-selector">
+                <option value="0">All</option>
+                <option value="1">Completed</option>
+                <option value="2">Not Completed</option>
+            </select>
         </form>
     </div>
 

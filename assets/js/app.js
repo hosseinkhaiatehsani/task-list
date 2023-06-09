@@ -11,11 +11,11 @@ let storageName = "to-do-list";
 const app = document.querySelector("[data-app]");
 const toDoForm = document.querySelector("[data-submit-todo-form]");
 // const addToDoButton = document.querySelector("[data-add-todo]");
+const categorySelector = document.querySelector("[data-category-select]");
 
 
 let isTaskDeaitlModalActive = false;
-let deferredPrompt;
-// console.log(TEST);
+// let deferredPrompt;
 
 document.addEventListener("DOMContentLoaded", function(){
     init();
@@ -33,26 +33,25 @@ document.addEventListener("DOMContentLoaded", function(){
 
 window.addEventListener("popstate", handleWindowBackButton);
 
-window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevents the default mini-infobar or install dialog from appearing on mobile
-    e.preventDefault();
-    // Save the event because you'll need to trigger it later.
-    deferredPrompt = e;
-    // Show your customized install prompt for your PWA
-    // Your own UI doesn't have to be a single element, you
-    // can have buttons in different locations, or wait to prompt
-    // as part of a critical journey.
-    // showInAppInstallPromotion();
-    console.log("before install was fired!")
-});
+// window.addEventListener('beforeinstallprompt', (e) => {
+//     // Prevents the default mini-infobar or install dialog from appearing on mobile
+//     e.preventDefault();
+//     // Save the event because you'll need to trigger it later.
+//     deferredPrompt = e;
+//     // Show your customized install prompt for your PWA
+//     // Your own UI doesn't have to be a single element, you
+//     // can have buttons in different locations, or wait to prompt
+//     // as part of a critical journey.
+//     // showInAppInstallPromotion();
+//     console.log("before install was fired!")
+// });
 
-// function createToDoInput(){
-//     let inputContainer = document.createElement("div");
-//     let input = document.createElement("input");
-// }
+
 async function init(){
     // openDatabase(storageName)
     toDoForm.addEventListener("submit", handleFromAction);
+    categorySelector.addEventListener("change", handleCategorySelect);
+
     let list = document.createElement("div");
     list.dataset.listId = "list-id";
     list.id = "list-container";
@@ -71,6 +70,7 @@ function handleFromAction(event){
 
     let newItem = {
         id: generateIndex(),
+        date: Date.now(),
         text: input.value,
         done: false,
     }
@@ -96,8 +96,6 @@ async function saveToStorage(){
     // let preparedData = JSON.stringify(toDoListData);
     // localStorage.setItem(storageName, preparedData);
     try{
-        // last step => face db.transaction is not a function
-        // console.log(toDoListData)
         await storeData(storageName, toDoListData);
     }catch(er) {
         console.log(er)
@@ -119,11 +117,19 @@ async function loadFromStorage(){
 
 }
 
-function renderToDoList(isFromDeleteMethod = false){
+function renderToDoList(customList = [],isFromDeleteMethod = false){
     if(toDoListData.length == 0 && !isFromDeleteMethod) return;
 
     let list = document.querySelector("[data-list-id]");
     list.innerHTML = "";
+
+    if(customList.length > 0){
+        customList.forEach(item => {
+            renderItem(item);
+        });
+
+        return;
+    }
 
     toDoListData.forEach(item => {
         renderItem(item);
@@ -199,7 +205,6 @@ function toggleToDoItemStatus(id){
 
 function toggleBlur(parent){
     let content = parent.querySelector(".item-content");
-    // console.log(content)
     content.classList.toggle("blur");
 }
 
@@ -225,7 +230,6 @@ async function handleItemDelete(e){
 // }
 
 function handleMagnifierButton(event){
-    // console.log(event.target)
     let itemId = event.target.parentElement.id;
     let data = toDoListData.filter(item => {
         return item.id == itemId;
@@ -258,9 +262,20 @@ function prepareModalContent(modalContent, data){
     isTaskDeaitlModalActive = true;
     history.pushState(null, null, window.location);
 
-    let modalHeader = document.createElement("h2");
+    let modalHeader = document.createElement("div");
     modalHeader.classList.add("modal-header");
-    modalHeader.innerText = "Description"
+    
+    let modalHeaderTitle = document.createElement("h2");
+    modalHeaderTitle.innerText = "Description";
+    modalHeader.appendChild(modalHeaderTitle);
+
+    if(data.date){
+        let modalHeaderTaskDate = document.createElement("span");
+        modalHeaderTaskDate.innerText = showProperDate(data.date);
+        modalHeader.appendChild(modalHeaderTaskDate);
+    }
+
+
 
     let textBox = document.createElement("textarea");
     textBox.classList.add("magnify-txt");
@@ -296,4 +311,27 @@ function handleWindowBackButton(){
     if(isTaskContentModalOpen()){
         closeModal();
     }
+}
+
+function handleCategorySelect(e){
+    e.preventDefault();
+
+    let value = parseInt(e.target.value);
+    let filteredList = [];
+    if(value == 0) {
+        filteredList = [];
+    } else if(value == 1){
+        filteredList = toDoListData.filter(item => item.done == true)
+    } else {
+        filteredList = toDoListData.filter(item => item.done == false)
+    }
+
+    renderToDoList(filteredList);
+}
+
+function showProperDate(date){
+    date = parseInt(date);
+    let proper = new Date(date);
+
+    return proper.toLocaleDateString();
 }
