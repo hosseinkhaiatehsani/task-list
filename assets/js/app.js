@@ -118,6 +118,7 @@ async function loadFromStorage(){
 }
 
 function renderToDoList(customList = [],isFromDeleteMethod = false){
+    checkIfLastItemExistsRemoveIt();
     if(toDoListData.length == 0 && !isFromDeleteMethod) return;
 
     let list = document.querySelector("[data-list-id]");
@@ -334,4 +335,13 @@ function showProperDate(date){
     let proper = new Date(date);
 
     return proper.toLocaleDateString();
+}
+
+function checkIfLastItemExistsRemoveIt(){
+    if(toDoListData.length == 0){
+        let lastItem = document.querySelector(".list-item");
+        if(lastItem){
+            lastItem.remove();
+        }
+    }
 }
